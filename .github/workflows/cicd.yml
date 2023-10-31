@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
 
 on:
   push:
@@ -42,3 +42,25 @@ jobs:
       # 5. Dockerhub push
       - name: docker hub push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/cicd-test
+
+  run-docker-image:
+    needs: build-docker-image
+    runs-on: self-hosted
+
+    steps:
+
+      # 1. 최신 이미지로 pull 받기
+      - name: docker pull
+        run: sudo docker pull
+
+      # 2. 기존의 도커 컨테이너 삭제
+      - name: docker stop container
+        run: sudo docker rm -f cicd-test
+
+      # 3. 최신 이미지로 도커 컨테이너 실행
+      - name: docker run new container
+        run: sudo docker run -it -d -p 8082:8080 --name cicd-test ${{ secrets.DOCKERHUB_USERNAME }}/cicd-test
+
+      # 4. 이미지 태그 none인 이미지 삭제
+      - name: docker rmi none image
+        run: sudo docker rmi $(docker images -f "dangling=true" -q)
