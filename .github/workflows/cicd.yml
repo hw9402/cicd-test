@@ -51,7 +51,7 @@ jobs:
 
       # 1. 최신 이미지로 pull 받기
       - name: docker pull
-        run: sudo docker pull
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/cicd-test
 
       # 2. 기존의 도커 컨테이너 삭제
       - name: docker stop container
